@@ -4,3 +4,5 @@
 0002-target-api-36-manifest.patch
 0003-compat-layer-hooks.patch
 0004-disable-legacy-admob.patch
+0005-remove-unused-permissions.patch
+0006-legacy-endpoint-https.patch
