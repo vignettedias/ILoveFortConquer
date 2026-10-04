@@ -1,0 +1,32 @@
+#!/bin/busybox sh
+/bin/busybox --install -s /bin
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs dev /dev
+echo "[initramfs] loading binder"
+insmod /binder_linux.ko || echo "[initramfs] insmod failed"
+# ashmem: Android 15/16 libcutils only uses memfd on kernels with the ACK ashmem-memfd compat
+# ioctls; mainline kernels need the out-of-tree ashmem driver (redroid-modules, ported to 6.8)
+insmod /ashmem_linux.ko || echo "[initramfs] ashmem insmod failed"
+echo "[initramfs] mounting root"
+mount -t ext4 -o rw,noatime /dev/vda /newroot || { echo "mount failed"; sh; }
+# Android disables module autoloading (kernel.modprobe is emptied in init.rc), so preload
+# the networking modules netd/iptables need, as a vendor kernel would have them built in.
+ln -s /newroot/lib /lib
+KV=$(uname -r)
+echo "[initramfs] preloading $(wc -l < /lib/modules/$KV/preload.list) modules"
+for m in $(cat /lib/modules/$KV/preload.list); do modprobe $m 2>/dev/null; done
+echo "[initramfs] loaded: $(wc -l < /proc/modules)"
+rm /lib
+# fresh /dev for Android (docker normally provides this)
+mount -t devtmpfs devtmpfs /newroot/dev
+ip link set lo up
+ip addr add 10.0.2.15/24 dev eth0
+ip link set eth0 up
+ip route add default via 10.0.2.2
+echo "[initramfs] network:"; ip addr show eth0
+ARGS=$(cat /proc/cmdline | tr ' ' '\n' | grep '^androidboot\.' | tr '\n' ' ')
+umount /proc /sys
+umount /dev
+echo "[initramfs] switch_root -> /init qemu=1 $ARGS"
+exec switch_root /newroot /init qemu=1 $ARGS
