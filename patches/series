@@ -1,0 +1,2 @@
+# Ordered list of compatibility patches applied to the apktool decode of the reference APK.
+# Each patch is a strict unified diff (diff -ruN a/ b/) relative to the decoded tree root.

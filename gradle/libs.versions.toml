@@ -1,0 +1,23 @@
+# Every tool used to rebuild Fort Conquer is pinned here. SHA-256 checksums of all
+# downloaded artifacts are additionally pinned in gradle/verification-metadata.xml.
+
+[versions]
+# apktool: decodes the reference APK to smali/resources and reassembles it (bundles smali,
+# baksmali, aapt2 and an Android framework resource table).
+apktool = "2.12.1"
+# uber-apk-signer bundles the AOSP build-tools 33.0.2 apksigner.jar and zipalign; only the
+# AOSP apksigner.jar (and zipalign) inside it are used.
+uberApkSigner = "1.3.0"
+# AOSP dx (Apache-2.0 repackaging of platform/dalvik/dx) converts the compat layer to dex.
+dalvikDx = "16.0.1"
+# baksmali (JesusFreke's original CLI) disassembles the compat dex for merging into classes.dex.
+baksmali = "2.5.2"
+# Complete Android 16 / API 36 framework jar (compile-time only).
+androidAllApi36 = "16-robolectric-13921718"
+
+[libraries]
+apktool = { module = "org.apktool.release:apktool", version.ref = "apktool" }
+uber-apk-signer = { module = "at.favre.tools.release:uber-apk-signer", version.ref = "uberApkSigner" }
+baksmali = { module = "org.smali:baksmali", version.ref = "baksmali" }
+dalvik-dx = { module = "com.jakewharton.android.repackaged:dalvik-dx", version.ref = "dalvikDx" }
+android-all-api36 = { module = "org.robolectric:android-all", version.ref = "androidAllApi36" }

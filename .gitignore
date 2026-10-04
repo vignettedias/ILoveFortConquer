@@ -1,0 +1,25 @@
+# Gradle / build outputs
+/.gradle/
+/build/
+/buildSrc/build/
+/buildSrc/.gradle/
+/compat/build/
+
+# Signing material must never be committed
+.signing/
+keystore.properties
+*.jks
+*.keystore
+*.p12
+*.pk8
+*.pem
+
+# Local tooling / IDE
+.idea/
+*.iml
+.vscode/
+local.properties
+.DS_Store
+
+# Test-run scratch output (logs/screenshots are curated into docs/ explicitly)
+/test-output/
