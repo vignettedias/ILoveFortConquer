@@ -16,11 +16,17 @@ import java.util.List;
  * STORED entry starts on a 4-byte boundary (16 KiB for native libraries). Compressed data is
  * copied byte-for-byte; only the local-header extra field is padded and the central directory
  * offsets are rewritten. Must run before apksigner (v2+ signatures cover the final layout).
+ *
+ * <p>apktool stamps every entry with the wall-clock build time; the DOS modification time and
+ * date are normalised to a fixed value (2008-01-01 00:00, as AOSP's build does) so that two
+ * builds of the same inputs produce byte-identical archives.
  */
 public final class ZipAlign {
     private ZipAlign() {}
 
     private static final int LFH_SIG = 0x04034b50, CDH_SIG = 0x02014b50, EOCD_SIG = 0x06054b50, DD_SIG = 0x08074b50;
+    /** DOS date 2008-01-01 ((year - 1980) << 9 | month << 5 | day) and time 00:00:00. */
+    private static final int FIXED_DOS_DATE = (2008 - 1980) << 9 | 1 << 5 | 1, FIXED_DOS_TIME = 0;
 
     public static void align(Path in, Path out) throws IOException {
         try (RandomAccessFile f = new RandomAccessFile(in.toFile(), "r");
@@ -73,6 +79,8 @@ public final class ZipAlign {
                 byte[] newExtra = new byte[lExtraLen + padding];
                 System.arraycopy(lExtra, 0, newExtra, 0, lExtraLen);
                 putLe16(lfh, 28, newExtra.length);
+                putLe16(lfh, 10, FIXED_DOS_TIME);
+                putLe16(lfh, 12, FIXED_DOS_DATE);
 
                 long newOffset = pos;
                 os.write(lfh);
@@ -91,6 +99,8 @@ public final class ZipAlign {
                 byte[] entry = new byte[46 + nameLen + extraLen + commentLen];
                 System.arraycopy(cd, p, entry, 0, entry.length);
                 putLe32(entry, 42, (int) newOffset);
+                putLe16(entry, 12, FIXED_DOS_TIME);
+                putLe16(entry, 14, FIXED_DOS_DATE);
                 newCd.add(entry);
                 p += entry.length;
             }

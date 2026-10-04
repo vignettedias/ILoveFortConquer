@@ -301,11 +301,18 @@ val verifyReleaseApk by tasks.registering(JavaExec::class) {
 // --------------------------------------------------------------------------------------------
 // 7. Publish to dist/
 // --------------------------------------------------------------------------------------------
-fun gitDescribe(): String = try {
-    val p = ProcessBuilder("git", "rev-parse", "HEAD").directory(rootDir).redirectErrorStream(true).start()
+fun git(vararg args: String): String? = try {
+    val p = ProcessBuilder("git", *args).directory(rootDir).redirectErrorStream(true).start()
     val out = p.inputStream.bufferedReader().readText().trim()
-    if (p.waitFor() == 0) out else "unknown"
-} catch (e: Exception) { "unknown" }
+    if (p.waitFor() == 0) out else null
+} catch (e: Exception) { null }
+
+// HEAD, suffixed with "-dirty" when tracked sources (anything outside dist/) have local changes.
+fun gitDescribe(): String {
+    val head = git("rev-parse", "HEAD") ?: return "unknown"
+    val changes = git("status", "--porcelain", "--untracked-files=no", "--", ".", ":(exclude)dist")
+    return if (changes.isNullOrEmpty()) head else "$head-dirty"
+}
 
 val assembleRelease by tasks.registering {
     group = "preservation"
