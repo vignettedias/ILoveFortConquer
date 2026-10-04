@@ -1,13 +1,15 @@
 package io.github.vignettedias.fortconquer.compat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+import android.view.KeyEvent;
 
 /**
- * Entry points called from the patched original bytecode (see patches/0004 and patches/0006).
+ * Entry points called from the patched original bytecode (patches/0003, 0007 and 0008).
  *
  * <p>Each hook is a thin adapter between the 2012-era game code and a modern Android platform
  * requirement. Version-specific framework types live in separate classes ({@link CutoutCompat},
@@ -28,6 +30,40 @@ public final class GameCompat {
         if (Build.VERSION.SDK_INT >= 33) {
             BackCompat.install(activity);
         }
+    }
+
+    /**
+     * Called at the start of {@code GameActivity.onKeyDown()} (patches/0008) so the back bridge
+     * can tell key-based back (already delivered as KEYCODE_BACK) from gesture back.
+     */
+    public static void onKeyDown(int keyCode, KeyEvent event) {
+        if (Build.VERSION.SDK_INT >= 33) {
+            BackCompat.onKeyDown(keyCode, event);
+        }
+    }
+
+    /**
+     * Shows a dialog built by the original code on the UI thread.
+     *
+     * <p>The coin store calls {@code PurchaseManager.buyItemInMainThread()} from AndEngine's
+     * update thread (touch events are processed there). When billing is unavailable the original
+     * code built the "Can't make purchases" AlertDialog on that Looper-less thread; dialog
+     * creation threw and the exception was swallowed, so the BUY buttons silently did nothing.
+     * Building the dialog content off-thread is harmless; only create()/show() must run on the
+     * UI thread.
+     */
+    public static void showDialogOnUiThread(final Activity activity, final AlertDialog.Builder builder) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (activity.isFinishing()) return;
+                try {
+                    builder.create().show();
+                } catch (RuntimeException e) {
+                    Log.w(PreservationInfo.TAG, "Could not show dialog", e);
+                }
+            }
+        });
     }
 
     /**

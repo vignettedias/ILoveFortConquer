@@ -6,3 +6,5 @@
 0004-disable-legacy-admob.patch
 0005-remove-unused-permissions.patch
 0006-legacy-endpoint-https.patch
+0007-billing-unavailable-dialog-ui-thread.patch
+0008-back-key-exactly-once.patch

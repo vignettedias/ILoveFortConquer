@@ -80,3 +80,148 @@ Fix (harness):    built the open-source ashmem driver from redroid-modules, port
                   VM initramfs. Not part of the APK. Real Android 15/16 devices ship this in their
                   kernels.
 ```
+
+## 5. Baseline confirmed on Android 16
+
+```text
+Issue:            Same as entry 2 on Android 16 (API 36, BP2A.250605.031.A3).
+Observed:         install Success (targetSdk=30); FATAL EXCEPTION: pool-6-thread-1
+                  java.lang.NoClassDefFoundError: ... DefaultHttpClient
+                    at com.droidhen.fortconquer.kits.DiscountManager$NetworkService.run(DiscountManager.java:152)
+```
+
+## 6. Raising targetSdkVersion 30 -> 36: required manifest changes
+
+```text
+Issue:            Modernise the target API (Android 16) without changing behaviour.
+Root cause:       targetSdk >= 31 refuses components with intent filters but no android:exported;
+                  targetSdk 36 on sw>=600dp displays ignores orientation requests unless the app is
+                  a game; informational compileSdk/platformBuildVersion attributes still said 30.
+Fix:              patches/0002-target-api-36-manifest.patch: apktool.yml targetSdkVersion 36,
+                  versionName "1.2.4-modern"; GameActivity android:exported="true";
+                  <application android:appCategory="game" android:enableOnBackInvokedCallback="true">;
+                  compileSdkVersion/platformBuildVersion attributes 36 (resources are linked against
+                  apktool 2.12.1's framework table, which contains the API 36 attributes).
+Validation:       Android 14 and 16 install and launch; dumpsys package shows targetSdk=36.
+```
+
+## 7. Legacy AdMob SDK crashes the game when targeting API 34+
+
+```text
+Issue:            Diagnostic build = 0001 + 0002 only (targetSdk 36, ads untouched) crashes on start.
+Affected version: any device running Android 14+ with an APK targeting API >= 34.
+Observed:         FATAL EXCEPTION: main
+                  java.lang.SecurityException: com.droidhen.fortconquer: One of RECEIVER_EXPORTED or
+                  RECEIVER_NOT_EXPORTED should be specified when a receiver isn't being registered
+                  exclusively for system broadcasts
+                    at android.content.ContextWrapper.registerReceiver(ContextWrapper.java:778)
+                    at com.google.android.gms.internal.ads.zzakk.zzal(Unknown Source:26)
+                    at com.google.android.gms.ads.internal.zza.<init>(Unknown Source:45)
+Root cause:       play-services-ads 15.0.1 (2018) registers a runtime receiver without the export
+                  flag that Android 14 requires for apps targeting API 34+.
+Fix:              patches/0004-disable-legacy-admob.patch: AdController.showAdInLayout() is a
+                  no-op, so no AdView is ever constructed (all other AdController methods are
+                  already null-safe). AD_ID permission removed. Rationale beyond the crash: the ad
+                  unit belongs to DroidHen's AdMob account and must not serve from an unofficial,
+                  re-signed build; the SDK version is long out of support and needs Play services.
+Validation:       0001+0002+0004 diagnostic build launches without crash on Android 16.
+```
+
+## 8. Android 16 no longer delivers KEYCODE_BACK to the game
+
+```text
+Issue:            Back navigation semantics change for targetSdk 36.
+Observed:         Diagnostic build without the compat hook (0001+0002+0004): pressing BACK on the
+                  title screen sends the game to the background (topResumedActivity becomes
+                  com.android.launcher3). The original consumes BACK on the title screen.
+Root cause:       Android 16 behaviour change: for apps targeting API 36, onBackPressed() is not
+                  called and KeyEvent.KEYCODE_BACK is not dispatched; back goes to
+                  OnBackInvokedCallback / predictive back. The game handles back only in
+                  GameActivity.onKeyDown -> SmartScene.onKeyDown (pause dialog in battle, previous
+                  scene in menus, no-op on the title screen).
+Fix:              compat BackCompat (API 33+) registers an OnBackInvokedCallback that calls the
+                  original GameActivity.onKeyDown(KEYCODE_BACK, ACTION_DOWN); manifest opts in
+                  with enableOnBackInvokedCallback="true" so back is never delivered twice.
+                  Hooked from GameActivity.onCreate (patches/0003-compat-layer-hooks.patch).
+Validation:       Android 14 and 16: BACK on title -> game stays resumed; BACK on STATUS -> title.
+```
+
+## 9. Edge-to-edge (Android 15+) would put the display cutout over the game
+
+```text
+Issue:            With targetSdk >= 35 the window is forced to LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS.
+Observed:         Android 16 + emulated "tall" cutout (cmd overlay
+                  com.android.internal.display.cutout.emulation.tall), landscape:
+                  - targetSdk 30 build: platform letterboxes the window (black bar on cutout side);
+                  - targetSdk 36 without compat: game drawn across the full width, under the cutout;
+                  - RC (compat): game inset by the cutout safe area (~96 px) - same geometry as the
+                    original. dumpsys window: layoutInDisplayCutoutMode=always.
+Fix:              compat CutoutCompat (API 28+): OnApplyWindowInsetsListener on android.R.id.content
+                  pads by DisplayCutout safe insets (system-bar insets intentionally ignored, as the
+                  original drew behind the immersive bars).
+Validation:       see screenshots in docs/compatibility/; touch mapping verified in gameplay tests.
+```
+
+## 10. Coin store "BUY" silently does nothing when billing is unavailable (original bug)
+
+```text
+Issue:            Tapping BUY in the coin store showed nothing at all.
+Affected version: every Android version whenever billing is unavailable; in this build billing
+                  is always unavailable (app delisted, AIDL billing retired, Play's service not
+                  visible to targetSdk >= 30 apps without <queries>).
+Root cause:       Game/engine bug. AndEngine processes touches on its update thread, so
+                  CoinStoreScene -> GameActivity.requestPurchaseItem() ->
+                  PurchaseManager.buyItemInMainThread() runs off the UI thread. With
+                  supportPurchase == false it calls alertBillingNotSupport(), whose
+                  AlertDialog.create() needs a Looper; the RuntimeException is swallowed by
+                  buyItemInMainThread's catch (Exception) block.
+Fix:              patches/0007-billing-unavailable-dialog-ui-thread.patch +
+                  GameCompat.showDialogOnUiThread(): the original dialog is built unchanged but
+                  created/shown on the UI thread.
+Validation:       Android 16: BUY -> "Can't make purchases / The Market billing service is not
+                  available at this time..." with OK / Learn more. "Learn more" opens the browser;
+                  with the only browser disabled it logs ActivityNotFoundException via
+                  GameCompat.startActivitySafely() and the game stays in the foreground.
+```
+
+## 11. Back pressed once in battle paused AND quit the battle (RC4 regression, fixed)
+
+```text
+Issue:            With RC4 a single BACK during a battle went straight to Select Troops; the
+                  targetSdk 30 reference build shows the PAUSE dialog for the same input.
+Observed:         Diagnostic build logging a stack trace in GameActivity.onKeyDown: on Android 16
+                  with enableOnBackInvokedCallback="true", key-based back still delivers
+                  KEYCODE_BACK ACTION_DOWN through ViewPostImeInputStage -> Activity.dispatchKeyEvent
+                  -> GameActivity.onKeyDown, and then also invokes the OnBackInvokedCallback
+                  ("back invoked" logged ~65 ms later). The original handler therefore ran twice:
+                  RUNNING -> pause, then PAUSE -> back to unit selection (GameScene.onKeyDown).
+Fix:              patches/0008-back-key-exactly-once.patch: GameActivity.onKeyDown first calls
+                  GameCompat.onKeyDown(); BackCompat remembers a real BACK DOWN and the callback
+                  only synthesizes KEYCODE_BACK when no key event reached the game (gesture back).
+Validation:       Android 16 RC5: BACK while running -> PAUSE (callback logs "already handled");
+                  BACK while paused -> Select Troops (original state machine); title -> no-op.
+```
+
+## 12. Large screens: appCategory="game" keeps the landscape lock (Android 16)
+
+```text
+Observed:         Display resized to 1200x1920 @200 dpi (sw960dp), user rotation locked to
+                  portrait. Variant without android:appCategory: Android 16 ignores the landscape
+                  request and runs the 800x480 game stretched into a portrait window. RC5 (with
+                  appCategory="game"): request honoured, landscape letterboxed, normal rendering.
+```
+
+## 13. Lifecycle evidence (Android 16, RC5)
+
+```text
+- Home during battle -> GL thread exits, launcher resumed; return -> new EGL context (AndEngine
+  logs EXTENSIONS again), all textures reloaded, battle state kept and auto-paused.
+- Screen off (KEYCODE_SLEEP) / on (WAKEUP + dismiss-keyguard) during battle -> auto-paused,
+  rendering intact, no crash.
+- Configuration changes outside the original configChanges list (adding a touchscreen device,
+  switching 3-button/gesture navigation overlays, display density) recreate GameActivity in the
+  same process; the original onDestroy/onCreate path re-initialises cleanly and returns to the
+  title screen. Saved progress is kept. (Original behaviour, kept unchanged.)
+- adb install -r (in-place update, same key) and am force-stop + relaunch keep all progress
+  (name, coins, crystals, stage, XP, cards) - read back from shared_prefs.
+```

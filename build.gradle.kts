@@ -232,6 +232,21 @@ val extractApksigner by tasks.registering(Copy::class) {
     into(layout.buildDirectory.dir("tools"))
 }
 
+val extractTools by tasks.registering(Copy::class) {
+    group = "preservation"
+    description = "Copies the pinned apktool jar, apksigner jar and aapt2 binary to build/tools for the scripts/."
+    dependsOn(extractApksigner)
+    from(apktool) { rename { "apktool.jar" } }
+    from(zipTree(apktool.singleFile)) {
+        val os = System.getProperty("os.name").lowercase()
+        include(if (os.contains("mac")) "prebuilt/macosx/aapt2_64" else "prebuilt/linux/aapt2_64")
+        eachFile { path = "aapt2" }
+        includeEmptyDirs = false
+    }
+    into(layout.buildDirectory.dir("tools"))
+    doLast { layout.buildDirectory.file("tools/aapt2").get().asFile.setExecutable(true) }
+}
+
 val signReleaseApk by tasks.registering(JavaExec::class) {
     group = "preservation"
     description = "Signs the aligned APK (v1+v2+v3) with the AOSP apksigner."

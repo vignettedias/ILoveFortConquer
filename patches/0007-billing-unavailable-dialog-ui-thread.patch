@@ -1,0 +1,19 @@
+diff -ruN '--exclude=build' '--exclude=dist' a/smali/com/droidhen/framework/billing/PurchaseManager.smali b/smali/com/droidhen/framework/billing/PurchaseManager.smali
+--- a/smali/com/droidhen/framework/billing/PurchaseManager.smali
++++ b/smali/com/droidhen/framework/billing/PurchaseManager.smali
+@@ -286,11 +286,11 @@
+     invoke-virtual {v1, v0, v2}, Landroid/app/AlertDialog$Builder;->setNegativeButton(ILandroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;
+ 
+     .line 134
+-    invoke-virtual {v1}, Landroid/app/AlertDialog$Builder;->create()Landroid/app/AlertDialog;
++    # preservation build: this method runs on AndEngine's update thread (coin-store touch);
++    # create()/show() must happen on the UI thread or the dialog silently fails.
++    iget-object v0, p0, Lcom/droidhen/framework/billing/PurchaseManager;->_activity:Landroid/app/Activity;
+ 
+-    move-result-object v0
+-
+-    invoke-virtual {v0}, Landroid/app/AlertDialog;->show()V
++    invoke-static {v0, v1}, Lio/github/vignettedias/fortconquer/compat/GameCompat;->showDialogOnUiThread(Landroid/app/Activity;Landroid/app/AlertDialog$Builder;)V
+ 
+     return-void
+ .end method

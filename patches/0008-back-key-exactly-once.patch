@@ -1,0 +1,13 @@
+diff -ruN '--exclude=build' '--exclude=dist' a/smali/com/droidhen/fortconquer/GameActivity.smali b/smali/com/droidhen/fortconquer/GameActivity.smali
+--- a/smali/com/droidhen/fortconquer/GameActivity.smali
++++ b/smali/com/droidhen/fortconquer/GameActivity.smali
+@@ -1834,6 +1834,9 @@
+ .method public onKeyDown(ILandroid/view/KeyEvent;)Z
+     .locals 2
+ 
++    # preservation build: lets the Android 13+/16 back bridge run the handler exactly once
++    invoke-static {p1, p2}, Lio/github/vignettedias/fortconquer/compat/GameCompat;->onKeyDown(ILandroid/view/KeyEvent;)V
++
+     const/4 v0, 0x4
+ 
+     if-ne p1, v0, :cond_3
