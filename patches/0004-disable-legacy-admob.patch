@@ -1,0 +1,63 @@
+diff -ruN '--exclude=build' '--exclude=dist' a/AndroidManifest.xml b/AndroidManifest.xml
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -7,7 +7,6 @@
+     <uses-permission android:name="com.android.vending.BILLING"/>
+     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+-    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="false" android:xlargeScreens="true"/>
+     <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"/>
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+diff -ruN '--exclude=build' '--exclude=dist' a/smali/com/droidhen/fortconquer/AdController.smali b/smali/com/droidhen/fortconquer/AdController.smali
+--- a/smali/com/droidhen/fortconquer/AdController.smali
++++ b/smali/com/droidhen/fortconquer/AdController.smali
+@@ -161,44 +161,10 @@
+ .end method
+ 
+ .method public static showAdInLayout(Landroid/app/Activity;Landroid/widget/RelativeLayout;)V
+-    .locals 1
+-
+-    .line 33
+-    new-instance v0, Lcom/google/android/gms/ads/AdView;
+-
+-    invoke-direct {v0, p0}, Lcom/google/android/gms/ads/AdView;-><init>(Landroid/content/Context;)V
+-
+-    sput-object v0, Lcom/droidhen/fortconquer/AdController;->adView:Lcom/google/android/gms/ads/AdView;
+-
+-    const-string p0, "ca-app-pub-6247246961848012/3820129282"
+-
+-    .line 34
+-    invoke-virtual {v0, p0}, Lcom/google/android/gms/ads/AdView;->setAdUnitId(Ljava/lang/String;)V
+-
+-    .line 35
+-    sget-object p0, Lcom/droidhen/fortconquer/AdController;->adView:Lcom/google/android/gms/ads/AdView;
+-
+-    sget-object v0, Lcom/google/android/gms/ads/AdSize;->BANNER:Lcom/google/android/gms/ads/AdSize;
+-
+-    invoke-virtual {p0, v0}, Lcom/google/android/gms/ads/AdView;->setAdSize(Lcom/google/android/gms/ads/AdSize;)V
+-
+-    const/16 p0, 0x53
+-
+-    .line 36
+-    invoke-virtual {p1, p0}, Landroid/widget/RelativeLayout;->setGravity(I)V
+-
+-    .line 37
+-    sget-object p0, Lcom/droidhen/fortconquer/AdController;->adView:Lcom/google/android/gms/ads/AdView;
+-
+-    invoke-virtual {p1, p0}, Landroid/widget/RelativeLayout;->addView(Landroid/view/View;)V
+-
+-    .line 38
+-    sput-object p1, Lcom/droidhen/fortconquer/AdController;->mParent:Landroid/widget/RelativeLayout;
+-
+-    .line 39
+-    sget-object p0, Lcom/droidhen/fortconquer/AdController;->adView:Lcom/google/android/gms/ads/AdView;
+-
+-    invoke-static {p0}, Lcom/droidhen/fortconquer/AdController;->loadAd(Lcom/google/android/gms/ads/AdView;)V
++    .locals 0
+ 
++    # preservation build: the 2018 AdMob SDK (play-services-ads 15.0.1) and DroidHen's ad unit
++    # are not used by this unofficial build. No AdView is created, so adView stays null and
++    # showAD/hideAD/destroyAD/getADview/restoreADview become no-ops through their null checks.
+     return-void
+ .end method
