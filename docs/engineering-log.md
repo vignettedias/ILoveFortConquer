@@ -159,7 +159,8 @@ Observed:         Android 16 + emulated "tall" cutout (cmd overlay
 Fix:              compat CutoutCompat (API 28+): OnApplyWindowInsetsListener on android.R.id.content
                   pads by DisplayCutout safe insets (system-bar insets intentionally ignored, as the
                   original drew behind the immersive bars).
-Validation:       see screenshots in docs/compatibility/; touch mapping verified in gameplay tests.
+Validation:       docs/evidence/android-16/05-cutout-comparison.jpg; the whole Android 16 RC5
+                  acceptance run was played with this cutout active (touch mapping verified).
 ```
 
 ## 10. Coin store "BUY" silently does nothing when billing is unavailable (original bug)
@@ -224,4 +225,71 @@ Observed:         Display resized to 1200x1920 @200 dpi (sw960dp), user rotation
   title screen. Saved progress is kept. (Original behaviour, kept unchanged.)
 - adb install -r (in-place update, same key) and am force-stop + relaunch keep all progress
   (name, coins, crystals, stage, XP, cards) - read back from shared_prefs.
+```
+
+## 14. Baseline confirmed on Android 15
+
+```text
+Issue:            Same as entry 2 on Android 15 (API 35, BP1A.250505.005.D1).
+Observed:         install Success; 4.5 s after am start: FATAL EXCEPTION: pool-6-thread-1 and
+                  pool-5-thread-1 (two discount requests), NoClassDefFoundError: ... DefaultHttpClient
+                  at DiscountManager$NetworkService.run(DiscountManager.java:152); the restarted
+                  process dies identically. See docs/baseline-failures/android-15.md.
+```
+
+## 15. Release APK was not reproducible (ZIP timestamps)
+
+```text
+Issue:            Rebuilding unchanged sources gave a different APK SHA-256 each time.
+Observed:         Two unsigned APKs from consecutive builds: identical entry order, sizes and
+                  CRC-32s; 649 of the 652 entries differed in their DOS time/date fields
+                  (e.g. resources.arsc 20:09:42 vs 20:10:34), nothing else differed.
+Root cause:       apktool writes the wall-clock time into every local and central header.
+Fix:              ZipAlign normalises time/date to 2008-01-01 00:00 while aligning (commit
+                  "build: byte-identical release APKs across rebuilds"); release metadata marks
+                  "-dirty" source trees.
+Validation:       two clean builds one minute apart -> aligned.apk and the signed APK identical
+                  (6ec49dd5...ee2588). The final APK's 652 entries match RC5's CRC-32 and sizes
+                  exactly, so RC5 test results carry over to it.
+```
+
+## 16. Android 14 routes key-based BACK only to the callback
+
+```text
+Observed:         Final APK on Android 14 (UD2A.240505.001.W1), enableOnBackInvokedCallback=true:
+                  every BACK key press logged "back invoked -> GameActivity.onKeyDown(KEYCODE_BACK)"
+                  - GameActivity.onKeyDown was NOT called by the framework. On Android 15 and 16 the
+                  same press reaches onKeyDown first and the callback logs "already handled".
+Consequence:      Both delivery orders occur in the field; BackCompat + 0008 handle both. Scene
+                  transitions on 14 (Coin Store -> Select Troops -> Status -> Title -> no-op;
+                  battle -> PAUSE -> Select Troops) match the original.
+```
+
+## 17. Network requests fail in the test environment (TLS interception) - not a game defect
+
+```text
+Observed:         Android 14/15/16: Arena and discount requests to
+                  https://fortconquer.droidhen.com fail with
+                  javax.net.ssl.SSLHandshakeException: Trust anchor for certification path not found
+                  at ArenaAgent$NetworkService.run(ArenaAgent.java:259).
+Root cause:       The build sandbox sends outbound TLS through an intercepting proxy whose CA is not
+                  trusted by the Android guests. Certificate validation works as designed.
+Decision:         No trust-store change, no custom TrustManager, no cleartext fallback. The server's
+                  real status remains unknown (documented in networking.md).
+Validation:       game shows its own "Network error" (CANCEL / RETRY); CANCEL -> Status, Arena
+                  energy 40/40, process alive.
+```
+
+## 18. Final acceptance runs
+
+```text
+Android 14 (final APK): install, launch, name/IME, stage 1 lost then won (11 kills, +157 coins,
+  +2 crystals), stage 2 unlocked, market, evolve, coin store "Can't make purchases", Learn more ->
+  browser, back navigation, battle PAUSE, Home/return and screen off/on with GL re-creation,
+  cutout, force-stop persistence, Arena offline. No crash (PID unchanged until force-stop).
+Android 15 (final APK): same set (12 kills, +117 coins, +1 crystal). No crash.
+Android 16 (final APK, smoke): install, launch, audio state (MediaPlayer started 44.1 kHz),
+  status, battle render, 5 BACK presses each handled once, cutout, relaunch. Full run: RC5.
+Not exercised: gesture back (SystemUI), Android 17 (no image), real Play billing, live server.
+Details and every PARTIAL / NOT TESTED cell: docs/compatibility/compatibility-matrix.md.
 ```
