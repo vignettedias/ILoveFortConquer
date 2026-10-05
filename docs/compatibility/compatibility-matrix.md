@@ -75,7 +75,9 @@ Details: [baseline-failures/](../baseline-failures/).
 1080×2340 panel at 450 dpi with an emulated punch-hole cutout, final APK: install, launch, name
 dialog, stage 1 won with drag-and-drop, market, evolve, coin store dialog, BACK in menus and
 battle, Home / screen off-on, force-stop persistence — all PASS. Real S25 hardware, One UI,
-120 Hz and Android 17 (One UI 9): NOT TESTED. Details: [devices/samsung-galaxy-s25.md](../devices/samsung-galaxy-s25.md).
+120 Hz and Android 17 (One UI 9): NOT TESTED by this project. **Real Galaxy S25:** the repository
+owner reported on 2026-10-05 that the release APK installed and the game worked (Android / One UI
+version not reported). Details: [devices/samsung-galaxy-s25.md](../devices/samsung-galaxy-s25.md).
 
 Per-version notes: [Android 14](android-14.md) · [Android 15](android-15.md) ·
 [Android 16](android-16.md) · [Android 17](android-17.md). Screenshots: [evidence/](../evidence/).

@@ -20,6 +20,13 @@ the one APK.
 4. Play Protect may warn about an unknown developer; check the SHA-256 above first.
 
 
+## Real-device report
+
+**2026-10-05 — reported by the repository owner:** the release APK (`6ec49dd5…`) was installed
+on a Samsung Galaxy S25 and the game worked. The Android / One UI version and the steps exercised
+were not reported, so this confirms installation and start-up on real S25 hardware; the
+detailed results below come from the emulated S25 profile.
+
 ## Which Android your S25 runs
 
 The S25 shipped with Android 15 (One UI 7) and received Android 16 (One UI 8). Samsung began
