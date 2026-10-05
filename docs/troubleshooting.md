@@ -3,6 +3,7 @@
 | Symptom | Cause | Fix |
 |---|---|---|
 | `INSTALL_FAILED_UPDATE_INCOMPATIBLE` / "App not installed as package conflicts with an existing package" | The original (or another preservation build) is installed and signed with a different key | Uninstall Fort Conquer first (this deletes its local save) |
+| Samsung Galaxy: the install is blocked by Auto Blocker (APK from an unauthorised source) | One UI's Auto Blocker is on by default | Settings → Security and privacy → Auto Blocker → off, install, then turn it back on if you want ([S25 notes](devices/samsung-galaxy-s25.md)) |
 | Play Protect warns or blocks the install | Unknown developer key | Review [signing.md](signing.md), compare the certificate SHA-256, then choose "Install anyway" if you trust the build |
 | Game shows "Network error" in Arena | Server unreachable or not serving HTTPS | Expected when offline; CANCEL returns to Status without losing energy. See [networking.md](networking.md) |
 | BUY shows "Can't make purchases" | Billing is unavailable for this build by design | — ([billing.md](billing.md)) |

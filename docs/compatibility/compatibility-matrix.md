@@ -70,5 +70,12 @@ Details: [baseline-failures/](../baseline-failures/).
 | Real Google Play purchase | NOT TESTED — no Play services; the game is delisted | NOT TESTED | NOT TESTED | NOT TESTED |
 | Final APK smoke test (exact `6ec49dd5…` file) | covered by the run above | covered by the run above | PASS — install, launch, title, audio state, status, battle render, BACK handled once (5 presses), cutout, relaunch; see [android-16.md](android-16.md) | NOT TESTED |
 
+## Device profile: Samsung Galaxy S25 (emulated display, Android 16)
+
+1080×2340 panel at 450 dpi with an emulated punch-hole cutout, final APK: install, launch, name
+dialog, stage 1 won with drag-and-drop, market, evolve, coin store dialog, BACK in menus and
+battle, Home / screen off-on, force-stop persistence — all PASS. Real S25 hardware, One UI,
+120 Hz and Android 17 (One UI 9): NOT TESTED. Details: [devices/samsung-galaxy-s25.md](../devices/samsung-galaxy-s25.md).
+
 Per-version notes: [Android 14](android-14.md) · [Android 15](android-15.md) ·
 [Android 16](android-16.md) · [Android 17](android-17.md). Screenshots: [evidence/](../evidence/).

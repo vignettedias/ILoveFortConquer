@@ -23,7 +23,12 @@ release, is not affiliated with or endorsed by DroidHen, and is not signed with 
 2. Check the file: `sha256sum FortConquer-1.2.4-Modern-Android.apk` must print the full SHA-256 above
    (`6ec49dd5…ee2588`), or run `scripts/verify_apk.sh`.
 3. Install it (`adb install FortConquer-1.2.4-Modern-Android.apk`, or open it on the device and
-   allow installing from that source).
+   allow installing from that source). On Samsung Galaxy phones, turn off **Auto Blocker**
+   (Settings → Security and privacy → Auto Blocker) first; it blocks APK installs by default.
+
+**Samsung Galaxy S25:** use the same APK — it is universal (no native code). See the
+[S25 notes](docs/devices/samsung-galaxy-s25.md) for Auto Blocker, One UI 9 / Android 17 and the
+S25 display-profile test.
 
 ## What changed
 

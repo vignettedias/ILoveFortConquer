@@ -293,3 +293,23 @@ Android 16 (final APK, smoke): install, launch, audio state (MediaPlayer started
 Not exercised: gesture back (SystemUI), Android 17 (no image), real Play billing, live server.
 Details and every PARTIAL / NOT TESTED cell: docs/compatibility/compatibility-matrix.md.
 ```
+
+## 19. Samsung Galaxy S25 display profile (Android 16) and Android 17 review
+
+```text
+Request:          provide the APK for a Samsung Galaxy S25.
+Finding:          the universal APK is the right file (no native code, density-independent
+                  assets). No device-specific build was made.
+Test:             Android 16 VM booted at 1080x2340 @450 dpi with an emulated punch-hole cutout
+                  (136 px); final APK 6ec49dd5...ee2588. GL surface 2204x1080; name/IME, stage 1
+                  won by drag-and-drop (12 kills, +114 coins, +1 crystal), market, evolve, coin
+                  store dialog, BACK in menus/battle (handled once), Home and screen off/on with
+                  GL re-creation, force-stop persistence: all PASS. TOTAL PSS 75 MB.
+120 Hz:           not testable here; bytecode review shows game speed is time-based (entity
+                  modifiers in seconds, Timer-based stage clock, currentTimeMillis income, card
+                  cooldowns as ScaleAtModifier durations).
+Android 17:       One UI 9 (Android 17) is rolling out to the S25 since late September 2026. Still no
+                  Android 17 image reachable (redroid has none; dl.google.com blocked). Reviewed
+                  Google's all-apps behaviour changes: no blocking issue found. NOT TESTED.
+Docs:             docs/devices/samsung-galaxy-s25.md, docs/compatibility/android-17.md.
+```

@@ -16,7 +16,7 @@
 
 | Not covered | Consequence |
 |---|---|
-| Android 17 | No image available — **not tested** |
+| Android 17 (already on e.g. Galaxy S25 with One UI 9) | No image available — **not tested**; static review only ([android-17.md](compatibility/android-17.md)) |
 | Physical phones/tablets, OEM skins, vendor GPU drivers | Tested only on AOSP (redroid) in a VM with Mesa/virgl — [testing-environment.md](testing-environment.md) |
 | Gesture-navigation (predictive) back | Test SystemUI did not deliver edge swipes; the code path is the callback path exercised on Android 14 |
 | Audio audibility, audio focus with other apps | Only player state checked |
