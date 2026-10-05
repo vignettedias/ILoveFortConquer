@@ -2,7 +2,9 @@
 """Client for fctouch. Screen coords are landscape (1600x720); converted to panel coords."""
 import socket, sys, time
 ROT = int(__import__('os').environ.get('FC_TOUCH_ROT', '1'))  # display rotation of the landscape game
-PW, PH = 720, 1600
+PW, PH = (int(v) for v in __import__('os').environ.get('FC_PANEL', '720x1600').split('x'))
+# Callers use 1600x720 landscape coordinates; scale them to the real landscape size (PH x PW).
+SX, SY = PH / 1600.0, PW / 720.0
 class Touch:
     def __init__(self):
         self.s = socket.create_connection(('127.0.0.1', 7070), timeout=30)
@@ -10,7 +12,7 @@ class Touch:
     def raw(self, line):
         self.f.write(line + '\n'); self.f.flush(); self.f.readline()
     def conv(self, x, y):
-        x, y = int(x), int(y)
+        x, y = int(x * SX), int(y * SY)
         if ROT == 1:   # display rotated 90: panel px = PW-1-y, py = x
             return PW - 1 - y, x
         if ROT == 3:   # rotated 270

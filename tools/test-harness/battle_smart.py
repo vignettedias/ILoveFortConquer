@@ -24,7 +24,8 @@ t0 = time.time()
 def screenshot():
     png = subprocess.run('adb -s %s exec-out screencap -p' % os.environ.get('FC_SERIAL', '127.0.0.1:6555'), shell=True, env=env,
                          capture_output=True).stdout
-    return Image.open(io.BytesIO(png)).convert('RGB')
+    im = Image.open(io.BytesIO(png)).convert('RGB')
+    return im if im.size == (1600, 720) else im.resize((1600, 720))  # radar sampled in 1600x720 space
 
 def threat(im):
     px = im.load(); res = []

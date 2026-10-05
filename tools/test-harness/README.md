@@ -18,7 +18,8 @@ in [docs/testing-environment.md](../../docs/testing-environment.md).
 
 Environment variables: `FC_HARNESS` (work directory for kernel, images, sockets; default
 `~/fc-harness`), `FC_SERIAL` (adb serial; default `127.0.0.1:6555`), `FC_TOUCH_ROT` (display
-rotation while the game runs in landscape; default `1`).
+rotation while the game runs in landscape; default `1`), `FC_PANEL` (physical panel size, default
+`720x1600`; scripts always use 1600×720 landscape coordinates and scale them).
 
 Typical session:
 
