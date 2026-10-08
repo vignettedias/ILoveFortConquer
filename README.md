@@ -30,6 +30,16 @@ release, is not affiliated with or endorsed by DroidHen, and is not signed with 
 [S25 notes](docs/devices/samsung-galaxy-s25.md) for Auto Blocker, One UI 9 / Android 17 and the
 S25 display-profile test.
 
+## Cheat variant: unlimited gems (separate APK)
+
+At the repository owner's request there is also a **cheat build**,
+[`dist/unlimited-gems/FortConquer-1.2.4-Modern-Android-UnlimitedGems.apk`](dist/unlimited-gems/)
+(SHA-256 `0ee2dea04cfc7c0d4934a0221c20505582a34271d208ab7d9384b226ab0f2fa7`): gems (crystals)
+stay at 99,999 no matter what you spend, and online Arena is switched off so the cheat cannot
+affect other players. It installs over the preservation build and keeps your progress. It is not
+part of the preservation build and not covered by its test results — see
+[docs/variants/unlimited-gems.md](docs/variants/unlimited-gems.md).
+
 ## What changed
 
 Eight small patches on top of the original bytecode plus a small compatibility layer (4 Java classes, ~230 lines with comments)

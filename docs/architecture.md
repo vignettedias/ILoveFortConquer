@@ -63,3 +63,10 @@ checks, so the build still verifies and runs its original paths on old releases 
 Game logic, balance, timings, assets, AndEngine, the renderer, the 800×480 stretch, sounds,
 save format, the billing implementation, the network protocol, the package name, versionCode,
 `configChanges`, launch mode and theme. See [preservation-notes.md](preservation-notes.md).
+
+## Variants
+
+`patches/variants/<name>/` holds opt-in patch series applied on top of the preservation series
+(`-Pfc.variant=<name>`, see [build.md](build.md#variants)). The only one is the
+[unlimited-gems cheat build](variants/unlimited-gems.md) — a separate APK in
+`dist/unlimited-gems/`; everything above describes the preservation build.

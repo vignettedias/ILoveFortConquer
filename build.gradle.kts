@@ -28,11 +28,19 @@ plugins {
 
 val referenceApkName = "com.droidhen.fortconquer_v1.2.4-31_Android-4.1.apk"
 val referenceApkSha256 = "933557dc1b5ba6c900b078689d269faf47c622fb3ea23acc3efa11b7c753cc92"
-val releaseBaseName = "FortConquer-1.2.4-Modern-Android"
+// Optional build variant: ./gradlew -Pfc.variant=<name> clean assembleRelease applies
+// patches/variants/<name>/series after patches/series, builds in build/fc-<name> and publishes to
+// dist/<name>/. Without the property the preservation build is produced, unchanged.
+val variants = mapOf(
+    "unlimited-gems" to ("UnlimitedGems" to "UNLIMITED GEMS CHEAT VARIANT (crystals pinned at 99999; online Arena disabled)"),
+)
+val fcVariant: String? = providers.gradleProperty("fc.variant").orNull?.takeIf { it.isNotBlank() }
+check(fcVariant == null || fcVariant in variants) { "unknown fc.variant '$fcVariant' (known: ${variants.keys})" }
+val releaseBaseName = "FortConquer-1.2.4-Modern-Android" + (fcVariant?.let { "-" + variants.getValue(it).first } ?: "")
 
 val referenceApk = layout.projectDirectory.file(referenceApkName)
-val fcDir = layout.buildDirectory.dir("fc")
-val distDir = layout.projectDirectory.dir("dist")
+val fcDir = layout.buildDirectory.dir(if (fcVariant == null) "fc" else "fc-$fcVariant")
+val distDir = layout.projectDirectory.dir(if (fcVariant == null) "dist" else "dist/$fcVariant")
 
 val apktool: Configuration by configurations.creating { isTransitive = false }
 val uberApkSigner: Configuration by configurations.creating { isTransitive = false }
@@ -94,6 +102,7 @@ val preparePatchedTree by tasks.registering(ApplyPatchesTask::class) {
     description = "Applies patches/series to the pristine decode (strict, no fuzz)."
     decodedDir.set(layout.dir(decodeReferenceApk.map { fcDir.get().dir("decoded").asFile }))
     patchesDir.set(layout.projectDirectory.dir("patches"))
+    fcVariant?.let { variantPatchesDir.set(layout.projectDirectory.dir("patches/variants/$it")) }
     outputDir.set(fcDir.map { it.dir("patched") })
 }
 
@@ -334,6 +343,10 @@ val assembleRelease by tasks.registering {
             .filter { Regex("""^\w+ = "[^"]+"$""").matches(it.trim()) }
         File(dist, "$releaseBaseName.metadata.txt").writeText(buildString {
             appendLine("Fort Conquer - Modern Android preservation build (UNOFFICIAL, not a DroidHen release)")
+            fcVariant?.let {
+                appendLine(variants.getValue(it).second)
+                appendLine("variant patches:     patches/variants/$it/series (applied after patches/series)")
+            }
             appendLine()
             appendLine("artifact:            ${apk.name}")
             appendLine("sha256:              $sha")

@@ -90,3 +90,16 @@ echo 0009-my-change.patch >> patches/series
 
 Patches are applied strictly: a hunk that does not match exactly fails the build, so a patch can
 never silently land in the wrong place.
+
+## Variants
+
+`-Pfc.variant=<name>` applies `patches/variants/<name>/series` after `patches/series`, builds in
+`build/fc-<name>/` and publishes to `dist/<name>/`. The only variant is the
+[unlimited-gems cheat build](variants/unlimited-gems.md):
+
+```sh
+./gradlew -Pfc.variant=unlimited-gems clean assembleRelease
+```
+
+Without the property the preservation build is produced unchanged. Variant patches are made the
+same way as above (`scripts/make_patch.sh` diffs against `build/fc/patched`, i.e. the base series).

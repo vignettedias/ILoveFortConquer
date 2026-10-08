@@ -8,6 +8,7 @@ Start with the top-level [README](../README.md). Then, by question:
 | Why does the original not run any more? | [baseline-failures/](baseline-failures/) ([14](baseline-failures/android-14.md), [15](baseline-failures/android-15.md), [16](baseline-failures/android-16.md), [17](baseline-failures/android-17.md)) |
 | What was changed, and how is it built? | [architecture.md](architecture.md), [build.md](build.md) |
 | I have a Samsung Galaxy S25 | [devices/samsung-galaxy-s25.md](devices/samsung-galaxy-s25.md) |
+| The unlimited-gems cheat APK (separate, not the preservation build) | [variants/unlimited-gems.md](variants/unlimited-gems.md) |
 | Does it work on my Android version? | [compatibility/compatibility-matrix.md](compatibility/compatibility-matrix.md) ([14](compatibility/android-14.md), [15](compatibility/android-15.md), [16](compatibility/android-16.md), [17](compatibility/android-17.md)) |
 | How was it tested, and what does that prove? | [testing-environment.md](testing-environment.md), [acceptance-test.md](acceptance-test.md), [evidence/](evidence/) |
 | What happened during the work, issue by issue? | [engineering-log.md](engineering-log.md) |
