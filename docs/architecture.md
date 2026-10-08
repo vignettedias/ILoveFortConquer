@@ -68,5 +68,5 @@ save format, the billing implementation, the network protocol, the package name,
 
 `patches/variants/<name>/` holds opt-in patch series applied on top of the preservation series
 (`-Pfc.variant=<name>`, see [build.md](build.md#variants)). The only one is the
-[unlimited-gems cheat build](variants/unlimited-gems.md) — a separate APK in
-`dist/unlimited-gems/`; everything above describes the preservation build.
+[unlimited gems + coins cheat build](variants/unlimited-gems-coins.md) — a separate APK in
+`dist/unlimited-gems-coins/`; everything above describes the preservation build.

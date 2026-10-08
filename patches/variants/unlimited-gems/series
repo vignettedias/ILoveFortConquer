@@ -1,5 +1,0 @@
-# Unlimited-gems CHEAT variant (opt-in: ./gradlew -Pfc.variant=unlimited-gems clean assembleRelease).
-# Applied after patches/series. Not part of the preservation build.
-9001-unlimited-crystals.patch
-9002-arena-offline.patch
-9003-variant-version-name.patch

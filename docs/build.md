@@ -95,10 +95,10 @@ never silently land in the wrong place.
 
 `-Pfc.variant=<name>` applies `patches/variants/<name>/series` after `patches/series`, builds in
 `build/fc-<name>/` and publishes to `dist/<name>/`. The only variant is the
-[unlimited-gems cheat build](variants/unlimited-gems.md):
+[unlimited gems + coins cheat build](variants/unlimited-gems-coins.md):
 
 ```sh
-./gradlew -Pfc.variant=unlimited-gems clean assembleRelease
+./gradlew -Pfc.variant=unlimited-gems-coins clean assembleRelease
 ```
 
 Without the property the preservation build is produced unchanged. Variant patches are made the

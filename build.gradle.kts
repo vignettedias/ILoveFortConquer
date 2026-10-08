@@ -32,7 +32,8 @@ val referenceApkSha256 = "933557dc1b5ba6c900b078689d269faf47c622fb3ea23acc3efa11
 // patches/variants/<name>/series after patches/series, builds in build/fc-<name> and publishes to
 // dist/<name>/. Without the property the preservation build is produced, unchanged.
 val variants = mapOf(
-    "unlimited-gems" to ("UnlimitedGems" to "UNLIMITED GEMS CHEAT VARIANT (crystals pinned at 99999; online Arena disabled)"),
+    "unlimited-gems-coins" to ("UnlimitedGemsCoins" to
+        "UNLIMITED GEMS + COINS CHEAT VARIANT (crystals pinned at 99999, coins at 9999999; online Arena disabled)"),
 )
 val fcVariant: String? = providers.gradleProperty("fc.variant").orNull?.takeIf { it.isNotBlank() }
 check(fcVariant == null || fcVariant in variants) { "unknown fc.variant '$fcVariant' (known: ${variants.keys})" }

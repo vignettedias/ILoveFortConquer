@@ -1,0 +1,6 @@
+# Unlimited gems + coins CHEAT variant
+# (opt-in: ./gradlew -Pfc.variant=unlimited-gems-coins clean assembleRelease).
+# Applied after patches/series. Not part of the preservation build.
+9001-unlimited-gems-and-coins.patch
+9002-arena-offline.patch
+9003-variant-version-name.patch

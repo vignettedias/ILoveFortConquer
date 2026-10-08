@@ -1,0 +1,36 @@
+diff -ruN '--exclude=build' '--exclude=dist' a/smali/com/droidhen/fortconquer/kits/ArenaAgent$NetworkService.smali b/smali/com/droidhen/fortconquer/kits/ArenaAgent$NetworkService.smali
+--- a/smali/com/droidhen/fortconquer/kits/ArenaAgent$NetworkService.smali
++++ b/smali/com/droidhen/fortconquer/kits/ArenaAgent$NetworkService.smali
+@@ -101,7 +101,10 @@
+ 
+     invoke-direct {v5}, Ljava/lang/StringBuilder;-><init>()V
+ 
+-    const-string v6, "https://fortconquer.droidhen.com/FortConquer/game/Main.php"
++    # cheat variant: Arena is offline-only. The reserved .invalid domain never resolves,
++    # so every Arena request fails into the game's own "Network error" dialog and no cheated
++    # team or result ever reaches the shared Arena server.
++    const-string v6, "https://arena-disabled.invalid/FortConquer/game/Main.php"
+ 
+     invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+ 
+@@ -133,7 +136,7 @@
+ 
+     invoke-direct {v6}, Ljava/lang/StringBuilder;-><init>()V
+ 
+-    const-string v7, "battle request:https://fortconquer.droidhen.com/FortConquer/game/Main.php"
++    const-string v7, "battle request:https://arena-disabled.invalid/FortConquer/game/Main.php"
+ 
+     invoke-virtual {v6, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+ 
+diff -ruN '--exclude=build' '--exclude=dist' a/smali/com/droidhen/fortconquer/kits/ArenaAgent.smali b/smali/com/droidhen/fortconquer/kits/ArenaAgent.smali
+--- a/smali/com/droidhen/fortconquer/kits/ArenaAgent.smali
++++ b/smali/com/droidhen/fortconquer/kits/ArenaAgent.smali
+@@ -16,7 +16,7 @@
+ 
+ .field public static final INSTANCE:Lcom/droidhen/fortconquer/kits/ArenaAgent;
+ 
+-.field public static final REPORT_URL:Ljava/lang/String; = "https://fortconquer.droidhen.com/FortConquer/game/Main.php"
++.field public static final REPORT_URL:Ljava/lang/String; = "https://arena-disabled.invalid/FortConquer/game/Main.php"
+ 
+ .field private static final SUCCESS:I = 0x0
+ 
